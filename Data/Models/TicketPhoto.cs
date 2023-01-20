@@ -11,6 +11,7 @@ namespace Data.Models
 
         [Required]
         [ForeignKey("Ticket")]
+        
         public string TicketId { get; set; }
         public virtual Ticket Ticket { get; set; }
     }
