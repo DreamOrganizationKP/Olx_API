@@ -21,6 +21,7 @@ builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<CategoryService>();
 builder.Services.AddTransient<TicketService>();
+builder.Services.AddTransient<JwtTokenService>();
 
 // Add services to the container.
 
