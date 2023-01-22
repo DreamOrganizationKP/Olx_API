@@ -8,9 +8,14 @@ namespace Data.AutoMapper
     {
         public AutoMapperConfiguration()
         {
+            // user
             CreateMap<RegisterRequestVM, User>().ForMember(dst => dst.UserName, act => act.MapFrom(src => src.Email));
             CreateMap<User, UserProfileVM>();
             CreateMap<LoginRequestVM, User>();
+
+            // Category
+
+            CreateMap<CreateCategoryRequestVM, Category>();
         }
     }
 }

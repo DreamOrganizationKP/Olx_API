@@ -1,6 +1,7 @@
 ﻿using Data.Context;
 using Data.Models;
 using Data.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories.Classes
 {
@@ -8,6 +9,11 @@ namespace Data.Repositories.Classes
     {
         public CategoryRepository(AppDbContext dbContext) : base(dbContext) { }
 
+        async Task<ICollection<Category>> ICategoryRepository.GetAllAsync()
+        {
+            var result = _dbContext.Categories.Where(c => c.ParentId == null).Include(c => c.SubCategories).ToList();
+            return result;
+        }
 
     }
 }

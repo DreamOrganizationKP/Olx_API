@@ -18,6 +18,11 @@ namespace Data.Context
             //    .Ignore(u => u.UserName)
             //    .Ignore(u => u.NormalizedUserName);
             //builder.Entity<User>().ToTable("AspNetUsers");
+
+            builder.Entity<Category>()
+                .HasOne(c => c.Parent)
+                .WithMany(c => c.SubCategories)
+                .OnDelete(DeleteBehavior.Cascade);
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Ticket> Tickets { get; set; }

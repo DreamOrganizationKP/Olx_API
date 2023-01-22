@@ -23,7 +23,20 @@ namespace Data.Repositories.Classes
         public async Task<EntityEntry> Delete(TModel model)
         {
             var result = _dbContext.Set<TModel>().Remove(model);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
+            return result;
+        }
+
+        public async Task<int> Delete(string id)
+        {
+            var result = await _dbContext.Set<TModel>().Where(x => x.Id == id).ExecuteDeleteAsync();
+            await _dbContext.SaveChangesAsync();
+            return result;
+        }
+
+        public async Task<ICollection<TModel>> GetAll()
+        {
+            var result = await _dbContext.Set<TModel>().ToListAsync();
             return result;
         }
 
