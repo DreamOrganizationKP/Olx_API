@@ -78,5 +78,33 @@ namespace Services.ServiceClasses
                 };
             }
         }
+
+        public async Task<SimpleResponseVM> DeleteAsync(string id)
+        {
+            try
+            {
+                var result = await _repository.Delete(id);
+
+                if(result > 0)
+                {
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = true
+                    };
+                }
+
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = false
+                };
+            }
+            catch (Exception)
+            {
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = false
+                };
+            }
+        }
     }
 }
