@@ -18,7 +18,7 @@ namespace Services.ServiceClasses
             _userManager = userManager;
         }
 
-        public async Task<string> CreateToken(User user)
+        public async Task<string> CreateTokenAsync(User user)
         {
             var roles = await _userManager.GetRolesAsync(user);
 
@@ -32,8 +32,8 @@ namespace Services.ServiceClasses
                 claims.Add(new Claim("role", role));
             }
 
-            var jwtKey = _configuration.GetSection("JwtKey").Value;
-            var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("jwtKey"));
+            var jwtKey = _configuration.GetSection("JwtOptions:JwtKey").Value;
+            var signInKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var signInCredentials = new SigningCredentials(signInKey, SecurityAlgorithms.HmacSha256);
             var jwt = new JwtSecurityToken(
                     signingCredentials: signInCredentials,

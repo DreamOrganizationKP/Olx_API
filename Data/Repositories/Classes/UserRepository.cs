@@ -12,5 +12,25 @@ namespace Data.Repositories.Classes
             _userManager = userManager;
             _signInManager = signInManager;
         }
+
+        public async Task<IdentityResult> RegisterAsync(User model, string password)
+        {
+            var result = await _userManager.CreateAsync(model, password);
+            return result;
+        }
+
+        public async Task<SignInResult> LoginAsync(string userName, string password, bool rememberMe)
+        {
+            
+            var result = await _signInManager.PasswordSignInAsync(userName, password, rememberMe, true);
+            return result;
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+
+            var result = await _userManager.FindByEmailAsync(email);
+            return result;
+        }
     }
 }
