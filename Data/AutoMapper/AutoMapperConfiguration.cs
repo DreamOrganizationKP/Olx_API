@@ -16,6 +16,10 @@ namespace Data.AutoMapper
             // Category
 
             CreateMap<CreateCategoryRequestVM, Category>();
+
+            // Ticket
+
+            CreateMap<CreateTicketRequestVM, Ticket>();
         }
     }
 }

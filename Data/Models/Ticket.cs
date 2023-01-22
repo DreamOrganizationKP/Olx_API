@@ -28,7 +28,7 @@ namespace Data.Models
         [StringLength(200)]
         public string Location { get; set; }
 
-        public bool IsActual { get; set; }
+        public bool IsActual { get; set; } = true;
         public virtual ICollection<TicketPhoto> Photos { get; set; }
 
     }
