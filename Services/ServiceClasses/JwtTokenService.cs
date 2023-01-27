@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -41,6 +42,19 @@ namespace Services.ServiceClasses
                     claims: claims
                 );
             return new JwtSecurityTokenHandler().WriteToken(jwt);
+        }
+
+        public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleTokenAsync(string googleToken)
+        {
+            string clientID = "17761511781-e38853miclpejbb61bhm76085f7oe1o2.apps.googleusercontent.com";
+
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            {
+                Audience = new List<string> { clientID }
+            };
+
+            var result = await GoogleJsonWebSignature.ValidateAsync(googleToken, settings);
+            return result;
         }
     }
 }

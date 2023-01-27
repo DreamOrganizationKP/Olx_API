@@ -44,6 +44,19 @@ namespace API.Controllers
             }
             return BadRequest(result);
         }
-        
+
+        [AllowAnonymous]
+        [HttpPost("googlelogin")]
+        public async Task<IActionResult> ExternalGoogleLoginAsync([FromQuery] string token)
+        {
+            var result = await _userService.ExternalGoogleLoginAsync(token);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
+
     }
 }

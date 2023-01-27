@@ -20,7 +20,6 @@ namespace API.Controllers
                     });
                 }
 
-
                 var fileName = Path.GetRandomFileName() + ".jpeg";
                 var path = Path.Combine(new[] { Directory.GetCurrentDirectory(), "images", fileName });
 

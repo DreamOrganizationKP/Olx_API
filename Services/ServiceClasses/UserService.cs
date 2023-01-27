@@ -2,6 +2,7 @@
 using Data.Models;
 using Data.Repositories.Classes;
 using Data.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Services.ServiceClasses
 {
@@ -83,6 +84,63 @@ namespace Services.ServiceClasses
                 return new LoginResponseVM()
                 {
                     IsSuccess = false,
+                };
+            }
+        }
+
+        public async Task<SimpleResponseVM> ExternalGoogleLoginAsync(string googleToken)
+        {
+            try
+            {
+                var validationResult = await _jwtTokenService.VerifyGoogleTokenAsync(googleToken);
+
+                if (validationResult == null)
+                {
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = false
+                    };
+                }
+
+                var user = await _repository.GetUserByEmail(validationResult.Email);
+
+                if(user == null)
+                {
+                    user = _mapper.Map<User>(validationResult);
+                    var registerResult = await _repository.RegisterAsync(user);
+
+                    if(!registerResult.Succeeded)
+                    {
+                        return new SimpleResponseVM()
+                        {
+                            IsSuccess = false,
+                        };
+                    }
+                }
+
+                var loginInfo = new UserLoginInfo("Google", validationResult.Subject, "Google");
+                var result = await _repository.AddLoginAsync(user, loginInfo);
+
+                if(result.Succeeded)
+                {
+                    var accessToken = await _jwtTokenService.CreateTokenAsync(user);
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = true,
+                        Payload = accessToken
+                    };
+                }
+
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = false
+                };
+            }
+            catch (Exception)
+            {
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = false
                 };
             }
         }
