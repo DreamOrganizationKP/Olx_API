@@ -13,9 +13,15 @@ namespace Data.Repositories.Classes
             _signInManager = signInManager;
         }
 
-        public async Task<IdentityResult> RegisterAsync(User model, string password = null)
+        public async Task<IdentityResult> RegisterAsync(User model, string password)
         {
             var result = await _userManager.CreateAsync(model, password);
+            return result;
+        }
+
+        public async Task<IdentityResult> RegisterAsync(User model)
+        {
+            var result = await _userManager.CreateAsync(model);
             return result;
         }
 

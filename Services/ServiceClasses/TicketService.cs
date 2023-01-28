@@ -8,11 +8,13 @@ namespace Services.ServiceClasses
     public class TicketService
     {
         private readonly ITicketRepository _repository;
+        private readonly ToolsService _toolsService;
         private readonly IMapper _mapper;
-        public TicketService(ITicketRepository repository, IMapper mapper)
+        public TicketService(ITicketRepository repository, IMapper mapper, ToolsService toolsService)
         {
             _repository = repository;
             _mapper = mapper;
+            _toolsService = toolsService;
         }
 
         public async Task<SimpleResponseVM> GetAsync(string id)
@@ -20,16 +22,24 @@ namespace Services.ServiceClasses
             try
             {
                 var result = await _repository.GetById(id);
+                if (result == null)
+                {
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = false
+                    };
+                }
+
+                var ticket = _mapper.Map<FrontTicketVM>(result);
 
                 return new SimpleResponseVM()
                 {
                     IsSuccess = true,
-                    Payload = result
+                    Payload = ticket
                 };
             }
             catch (Exception)
             {
-
                 return new SimpleResponseVM()
                 {
                     IsSuccess = false
@@ -42,11 +52,13 @@ namespace Services.ServiceClasses
             try
             {
                 var result = await _repository.GetAllAsync(categoryId);
+                
+                var mappedTickets = _mapper.Map<ICollection<Ticket>, IEnumerable<FrontTicketVM>>(result);
 
                 return new SimpleResponseVM()
                 {
                     IsSuccess = true,
-                    Payload = result
+                    Payload = mappedTickets
                 };
             }
             catch (Exception)
@@ -62,12 +74,38 @@ namespace Services.ServiceClasses
         {
             try
             {
+                List<TicketPhoto> photos = null;
+                if(model.Photos != null && model.Photos.Count > 0)
+                {
+                    photos = new List<TicketPhoto>();
+                    foreach(var photo in model.Photos)
+                    {
+                        var path = await _toolsService.SaveImageOnDiskAsync(photo.Image);
+                        var newPhoto = new TicketPhoto()
+                        {
+                            Path = path,
+                            Index = photo.Index,
+                        };
+                        photos.Add(newPhoto);
+                    }
+                }
+                model.Photos = null;
                 var ticket = _mapper.Map<Ticket>(model);
+                ticket.Photos = photos;
                 var result = await _repository.Create(ticket);
+
+                if(ticket.Id != null)
+                {
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = true,
+                        Payload = ticket
+                    };
+                }
 
                 return new SimpleResponseVM()
                 {
-                    IsSuccess = true
+                    IsSuccess= false
                 };
             }
             catch (Exception)

@@ -1,5 +1,6 @@
 ﻿using Data.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Services.ServiceClasses;
 
 namespace API.Controllers
 {
@@ -7,6 +8,12 @@ namespace API.Controllers
     [ApiController]
     public class ImageController : ControllerBase
     {
+        private readonly ToolsService _toolsService;
+        public ImageController(ToolsService toolsService)
+        {
+            _toolsService = toolsService;
+        }
+
         [HttpPost("upload")]
         public async Task<IActionResult> UploadImage([FromForm] UploadImageRequestVM<IFormFile> model)
         {
@@ -20,15 +27,7 @@ namespace API.Controllers
                     });
                 }
 
-                var fileName = Path.GetRandomFileName() + ".jpeg";
-                var path = Path.Combine(new[] { Directory.GetCurrentDirectory(), "images", fileName });
-
-                using (var stream = new MemoryStream())
-                {
-                    await model.Image.CopyToAsync(stream);
-                    stream.Position = 0L;
-                    CompressImage(stream, path);
-                }
+                var fileName = await _toolsService.SaveImageOnDiskAsync(model.Image);
 
                 return Ok(new SimpleResponseVM()
                 {
@@ -58,16 +57,9 @@ namespace API.Controllers
                     });
                 }
 
-                var fileName = Path.GetRandomFileName() + ".jpeg";
-                var path = Path.Combine(new[] { Directory.GetCurrentDirectory(), "images", fileName });
-                byte[] buffer = Convert.FromBase64String(model.Image);
+                var fileName = await _toolsService.SaveImageOnDiskAsync(model.Image);
 
-                using (var stream = new MemoryStream(buffer))
-                {
-                    CompressImage(stream, path);
-                }
-
-                return Ok(new SimpleResponseVM()
+                return BadRequest(new SimpleResponseVM()
                 {
                     IsSuccess = true,
                     Payload = fileName
@@ -82,19 +74,6 @@ namespace API.Controllers
             }
         }
 
-        private void CompressImage(Stream stream, string filePath)
-        {
-            var settings = new PhotoSauce.MagicScaler.ProcessImageSettings()
-            {
-                EncoderOptions = new PhotoSauce.MagicScaler.JpegEncoderOptions()
-                {
-                    Quality = 65,
-                    Subsample = PhotoSauce.MagicScaler.ChromaSubsampleMode.Default
-                },
-            };
-
-            using var ms = new FileStream(filePath, FileMode.CreateNew);
-            PhotoSauce.MagicScaler.MagicImageProcessor.ProcessImage(stream, ms, settings);
-        }
+        
     }
 }

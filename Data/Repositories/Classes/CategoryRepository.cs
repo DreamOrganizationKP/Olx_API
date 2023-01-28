@@ -15,5 +15,10 @@ namespace Data.Repositories.Classes
             return result;
         }
 
+        public async Task<Category> GetById(string id)
+        {
+            var result = await _dbContext.Categories.Where(c => c.Id == id).Include(c => c.SubCategories).FirstOrDefaultAsync();
+            return result;
+        }
     }
 }

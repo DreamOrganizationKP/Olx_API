@@ -28,6 +28,7 @@ builder.Services.AddTransient<UserService>();
 builder.Services.AddTransient<CategoryService>();
 builder.Services.AddTransient<TicketService>();
 builder.Services.AddTransient<JwtTokenService>();
+builder.Services.AddTransient<ToolsService>();
 
 
 builder.Services.AddAutoMapper(typeof(AutoMapperConfiguration));
@@ -95,6 +96,12 @@ app.UseStaticFiles(new StaticFileOptions()
     FileProvider = new PhysicalFileProvider(imagesPath),
     RequestPath = "/images"
 });
+
+app.UseCors(options => options
+    .WithOrigins(new[] { "http://localhost:3000", "http://20.55.67.29:80", "http://20.55.67.29" })
+    .AllowAnyHeader()
+    .AllowCredentials()
+);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
