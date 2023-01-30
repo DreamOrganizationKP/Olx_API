@@ -88,7 +88,7 @@ namespace Services.ServiceClasses
             }
         }
 
-        public async Task<SimpleResponseVM> ExternalGoogleLoginAsync(string googleToken)
+        public async Task<LoginResponseVM> ExternalGoogleLoginAsync(string googleToken)
         {
             try
             {
@@ -96,9 +96,10 @@ namespace Services.ServiceClasses
 
                 if (validationResult == null)
                 {
-                    return new SimpleResponseVM()
+                    return new LoginResponseVM()
                     {
-                        IsSuccess = false
+                        IsSuccess = false,
+                        IsCredentialsValid = false,
                     };
                 }
 
@@ -116,9 +117,10 @@ namespace Services.ServiceClasses
 
                         if (!registerResult.Succeeded)
                         {
-                            return new SimpleResponseVM()
+                            return new LoginResponseVM()
                             {
                                 IsSuccess = false,
+                                IsCredentialsValid = false
                             };
                         }
                     }
@@ -126,25 +128,30 @@ namespace Services.ServiceClasses
 
                     if(!result.Succeeded)
                     {
-                        return new SimpleResponseVM()
+                        return new LoginResponseVM()
                         {
                             IsSuccess = false,
+                            IsCredentialsValid = false
                         };
                     }
                 }
 
                 var accessToken = await _jwtTokenService.CreateTokenAsync(user);
-                return new SimpleResponseVM()
+                var profile = _mapper.Map<UserProfileVM>(user);
+                return new LoginResponseVM()
                 {
                     IsSuccess = true,
-                    Payload = accessToken
+                    IsCredentialsValid = true,
+                    Profile = profile,
+                    AccessToken = accessToken
                 };
             }
             catch (Exception)
             {
-                return new SimpleResponseVM()
+                return new LoginResponseVM()
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    IsCredentialsValid = false,
                 };
             }
         }
