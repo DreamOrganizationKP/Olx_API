@@ -41,8 +41,13 @@ namespace Data.Repositories.Classes
 
         public async Task<User> GetUserByEmail(string email)
         {
-
             var result = await _userManager.FindByEmailAsync(email);
+            return result;
+        }
+
+        public async Task<User> FindByLoginAsync(string logimProvider, string providerKey)
+        {
+            var result = await _userManager.FindByLoginAsync(logimProvider, providerKey);
             return result;
         }
     }

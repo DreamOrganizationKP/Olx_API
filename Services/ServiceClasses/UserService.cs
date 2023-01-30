@@ -102,14 +102,29 @@ namespace Services.ServiceClasses
                     };
                 }
 
-                var user = await _repository.GetUserByEmail(validationResult.Email);
+                var info = new UserLoginInfo("Google", validationResult.Subject, "Google");
+                var user = await _repository.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
 
                 if(user == null)
                 {
-                    user = _mapper.Map<User>(validationResult);
-                    var registerResult = await _repository.RegisterAsync(user);
+                    user = await _repository.GetUserByEmail(validationResult.Email);
 
-                    if(!registerResult.Succeeded)
+                    if(user == null)
+                    {
+                        user = _mapper.Map<User>(validationResult);
+                        var registerResult = await _repository.RegisterAsync(user);
+
+                        if (!registerResult.Succeeded)
+                        {
+                            return new SimpleResponseVM()
+                            {
+                                IsSuccess = false,
+                            };
+                        }
+                    }
+                    var result = await _repository.AddLoginAsync(user, info);
+
+                    if(!result.Succeeded)
                     {
                         return new SimpleResponseVM()
                         {
@@ -118,22 +133,11 @@ namespace Services.ServiceClasses
                     }
                 }
 
-                var loginInfo = new UserLoginInfo("Google", validationResult.Subject, "Google");
-                var result = await _repository.AddLoginAsync(user, loginInfo);
-
-                if(result.Succeeded)
-                {
-                    var accessToken = await _jwtTokenService.CreateTokenAsync(user);
-                    return new SimpleResponseVM()
-                    {
-                        IsSuccess = true,
-                        Payload = accessToken
-                    };
-                }
-
+                var accessToken = await _jwtTokenService.CreateTokenAsync(user);
                 return new SimpleResponseVM()
                 {
-                    IsSuccess = false
+                    IsSuccess = true,
+                    Payload = accessToken
                 };
             }
             catch (Exception)
