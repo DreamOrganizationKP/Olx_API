@@ -6,5 +6,6 @@ namespace Data.Repositories.Interfaces
     {
         Task<ICollection<Ticket>> GetAllAsync(string categoryId);
         Task<Ticket> GetById(string id);
+        Task<IEnumerable<Ticket>> SearchAsync(string value);
     }
 }

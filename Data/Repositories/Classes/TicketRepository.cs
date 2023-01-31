@@ -20,5 +20,11 @@ namespace Data.Repositories.Classes
             var result = _dbContext.Tickets.Where(t => t.Id == id).Include(t => t.Photos).Include(t => t.User).FirstOrDefault();
             return result;
         }
+
+        public async Task<IEnumerable<Ticket>> SearchAsync(string value)
+        {
+            var result = await _dbContext.Tickets.Where(t => (t.Name + " " + t.Description).ToLower().Contains(value.ToLower())).Include(t => t.Category).Include(t => t.Photos).ToListAsync();
+            return result;
+        }
     }
 }

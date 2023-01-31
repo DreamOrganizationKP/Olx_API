@@ -14,7 +14,7 @@ namespace Data.Models
         public string ParentId { get; set; }
         public virtual Category Parent { get; set; }
         public virtual ICollection<Category> SubCategories { get; set;}
-        public virtual ICollection<Ticket> Tickets { get; set;}
+        //public virtual ICollection<Ticket> Tickets { get; set;}
 
     }
 }

@@ -61,5 +61,17 @@ namespace API.Controllers
             }
             return BadRequest(result);
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchAsync(string value)
+        {
+            var result = await _ticketService.SearchAsync(value);
+
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result);
+        }
     }
 }

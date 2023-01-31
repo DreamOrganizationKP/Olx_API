@@ -96,10 +96,11 @@ namespace Services.ServiceClasses
 
                 if(ticket.Id != null)
                 {
+                    var ticketVM = _mapper.Map<FrontTicketVM>(ticket);
                     return new SimpleResponseVM()
                     {
                         IsSuccess = true,
-                        Payload = ticket
+                        Payload = ticketVM
                     };
                 }
 
@@ -134,6 +135,37 @@ namespace Services.ServiceClasses
                 return new SimpleResponseVM()
                 {
                     IsSuccess = false
+                };
+            }
+            catch (Exception)
+            {
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = false
+                };
+            }
+        }
+
+        public async Task<SimpleResponseVM> SearchAsync(string value)
+        {
+            try
+            {
+                var result = await _repository.SearchAsync(value);
+
+                var tickets = _mapper.Map<IEnumerable<Ticket>, IEnumerable<FrontTicketVM>>(result);
+
+                if(result == null)
+                {
+                    return new SimpleResponseVM()
+                    {
+                        IsSuccess = false
+                    };
+                }
+
+                return new SimpleResponseVM()
+                {
+                    IsSuccess = true,
+                    Payload = tickets
                 };
             }
             catch (Exception)
